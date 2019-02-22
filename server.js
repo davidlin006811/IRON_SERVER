@@ -3,8 +3,10 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cros = require("cors");
 const morgan = require("morgan");
+const helmet = require("helmet");
 const app = express();
-
+// use helmet to secure express
+app.use(helmet);
 //Enable cros to skip the Same origin policy, it will be changed when deploying
 app.use(cros());
 // log client request to console
@@ -35,7 +37,8 @@ io.on("connection", function(socket) {
 
 //setup router
 const productRouter = require("./routers/productRouter");
-
+const userRouter = require("./routers/userRouter");
+app.use("/api", userRouter);
 app.use("/api/product", productRouter);
 
 const PORT = process.env.PORT || 3000;

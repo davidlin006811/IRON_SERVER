@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/product");
-const Passport = require("../functions/passport");
 const multer = require("multer");
-const isLoggedIn = Passport.isLoggedIn;
+const isLoggedIn = require("../functions/isLoggedin");
 const mongoose = require("mongoose");
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
@@ -41,8 +40,8 @@ router.get("/all", (req, res) => {
     .then(products => res.json(products));
 });
 
-router.post("/", upload.array("images"), (req, res) => {
-  console.log("file: ", req.files);
+router.post("/", isLoggedIn, upload.array("images"), (req, res) => {
+  //console.log("file: ", req.files);
   var filePaths = req.files.map(file =>
     file.path.replace(new RegExp("\\\\", "g"), "/")
   );
@@ -57,7 +56,7 @@ router.post("/", upload.array("images"), (req, res) => {
   product
     .save()
     .then(result => {
-      console.log(result);
+      // console.log(result);
       const newProduct = {
         createdProduct: {
           name: result.name,
