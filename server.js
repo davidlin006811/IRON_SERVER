@@ -35,7 +35,8 @@ io.on("connection", function(socket) {
 
 //setup router
 const productRouter = require("./routers/productRouter");
-
+const userRouter = require("./routers/userRouter");
+app.use("/api", userRouter);
 app.use("/api/product", productRouter);
 
 const PORT = process.env.PORT || 3000;
