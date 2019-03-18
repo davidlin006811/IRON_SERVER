@@ -1,0 +1,46 @@
+- Review Router
+
+Reviews - a component contains dynamic content. This component contains the following APIs:
+1) Get all reviews
+  Method: Get
+  Url: /api/review/all
+  Response:
+    if Success, return JSON {code: 0, message: "get reviews successfully", reviews: [{name: string, rating: int, comment: string}]}
+    if Error, return JSON {code:1, message: "server or network error"}
+
+2) Submit a review
+  Method: Post
+  Url: /api/review,
+  Body: {"name": string, "rating": int, "comment": string}
+  Response: 
+    if Success, return JSON {code: 0, message: "submit a review successfully", review: {name: string, rating:int, comment:string}}
+          if Error, return JSON {code:1, message: "server or network error"}
+
+- Message Router
+
+Submit a Message
+  Method: Post
+  Url: /api/message,
+  Body: {"name": string, "email": string, "message": string}
+  Response: 
+        if Success, return JSON {code: 0, message: "submit a message successfully"}
+        if Error, return JSON {code:1, message: "server or network error"}
+
+- Appointment Router
+
+  Method: Post
+  Url: /api/appointment
+  Body: { "name": string, "email": string, "appointment_date": string, "request_info": string}
+  Response:
+    if Success, return JSON {code: 0, message: "submit an appointment successfully"}
+    if Error, return JSON {code:1, message: "server or network error"}
+
+
+- Recruitment Router
+
+  Method: Post
+  Url: /api/job/apply
+  Body: {" jobId": string, "name": string, "email": string, "resume": [File]}
+  Response:
+    if Success, return JSON {code: 0, message: "apply a job successfully"}
+    if Error, return JSON {code:1, message: "server or network error"}
