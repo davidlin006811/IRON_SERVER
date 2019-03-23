@@ -5,6 +5,7 @@ const uuid = require("../functions/uuid");
 const ADMIN = require("../config/admin").role;
 const SMSNumber = require("../config/admin").SMSNumber;
 const MailNode = require("../functions/mail");
+const isEmpty = require("../functions/isEmpty");
 router.get("/all", (req, res) => {
   Message.find()
     .sort({ date: -1 })
@@ -30,12 +31,15 @@ router.post("/", (req, res) => {
       date: data.date
     };
     //if onwer is online and logged in, send the message via socket.io
-    if (ADMIN in global[uuid]) {
-      global[uuid][ADMIN].emit("new message", result, function() {
-        res
-          .status(200)
-          .json({ code: 0, message: "Message was sent to the owner" });
-      });
+    if (!isEmpty(global[uuid])) {
+      const admins = Object.keys(global[uuid]);
+      for (const admin in admins) {
+        global[uuid][admin].emit("new message", result);
+      }
+
+      res
+        .status(200)
+        .json({ code: 0, message: "Message was sent to the owner" });
     } else {
       const subject = "A Message From Client";
       const content =

@@ -9,8 +9,8 @@ module.exports.generateJWT = () => {
 };
 /*Decode JSON Web Token */
 module.exports.verifyToken = token => {
-  console.log("token: ", token);
-  console.log("admin tokenSecret: ", admin.tokenSecret);
+  // console.log("token: ", token);
+  //console.log("admin tokenSecret: ", admin.tokenSecret);
   return new Promise((resolve, reject) => {
     JWT.verify(token, admin.tokenSecret, {}, (err, decode) => {
       if (err) {

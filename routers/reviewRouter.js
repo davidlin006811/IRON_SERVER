@@ -2,10 +2,9 @@ const express = require("express");
 const router = express.Router();
 const Review = require("../models/review");
 const uuid = require("../functions/uuid");
-const ADMIN = require("../config/admin").role;
 const SMSNumber = require("../config/admin").SMSNumber;
 const MailNode = require("../functions/mail");
-
+const isEmpty = require("../functions/isEmpty");
 //1) Get all reviews API - /api/review/all, for the response, please refer to the client-side coding tasks.
 router.get("/all", (req, res) => {
   Review.find()
@@ -34,14 +33,16 @@ router.post("/", (req, res) => {
       }
     };
     //if onwer is online and logged in, send the message via socket.io
-    if (ADMIN in global[uuid]) {
-      global[uuid][ADMIN].emit("new message", result, function() {
-        res
-          .status(200)
-          .json({ code: 0, message: "ubmit a review successfully", result });
-      });
+    if (!isEmpty(global[uuid])) {
+      const admins = Object.keys(global[uuid]);
+      for (const admin in admins) {
+        global[uuid][admin].emit("new review", result);
+      }
+      res
+        .status(200)
+        .json({ code: 0, message: "A review was sent to the owner" });
     } else {
-      const subject = "A Message From Client";
+      const subject = "A Review From Client";
       const content =
         "Client Name: " +
         data.name +

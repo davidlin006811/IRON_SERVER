@@ -9,12 +9,13 @@ const fs = require("fs");
 /* Get all product infromation*/
 
 router.get("/all", (req, res) => {
+  // console.log("uuid: ", global[uuid]);
   Product.find()
     .sort({ date: -1 })
     .then(products => res.json(products));
 });
 // Add a new product
-router.post("/", isLoggedIn, upload.array("images"), (req, res) => {
+router.post("/", upload.array("images"), (req, res) => {
   //console.log("reg: ", req);
   var filePaths = req.files.map(file =>
     file.path.replace(new RegExp("\\\\", "g"), "/")
@@ -33,8 +34,8 @@ router.post("/", isLoggedIn, upload.array("images"), (req, res) => {
       // console.log(result);
       const newProduct = {
         createdProduct: {
+          _id: result._id,
           name: result.name,
-          type: result.type,
           description: result.description,
           images: result.images
         }
@@ -56,8 +57,11 @@ router.post("/", isLoggedIn, upload.array("images"), (req, res) => {
 //Update a product
 router.patch("/:id", (req, res) => {
   //console.log(req);
-  Product.update({ _id: req.params.id }, req.body)
-    .then(result => res.status(200).json(result))
+  Product.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true })
+    .then(result => {
+      io.sockets.emit("update product", result);
+      res.status(200).json({ code: 0, message: "update product successfully" });
+    })
     .catch(err =>
       res.status(500).json({
         error: err
@@ -80,7 +84,8 @@ router.delete("/:id", (req, res) => {
           console.log(err);
         }
       });
-      res.status(200).json({ code: 0, message: result.name + " was removed" });
+      io.sockets.emit("delete product", result);
+      res.status(200).json({ code: 0, message: "delete product successfully" });
     })
     .catch(err =>
       res.status(500).json({
