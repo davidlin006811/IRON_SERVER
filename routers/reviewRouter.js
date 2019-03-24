@@ -24,41 +24,36 @@ router.post("/", (req, res) => {
   });
 
   review.save().then(data => {
-    //console.log(result);
-    const result = {
-      createdReview: {
-        name: data.name,
-        rating: data.rating,
-        comment: data.comment
-      }
-    };
     //if onwer is online and logged in, send the message via socket.io
-    if (!isEmpty(global[uuid])) {
-      const admins = Object.keys(global[uuid]);
-      for (const admin in admins) {
-        global[uuid][admin].emit("new review", result);
-      }
-      res
-        .status(200)
-        .json({ code: 0, message: "A review was sent to the owner" });
-    } else {
-      const subject = "A Review From Client";
-      const content =
-        "Client Name: " +
-        data.name +
-        "\n" +
-        "Client Rating: " +
-        "\n" +
-        data.rating +
-        "\n" +
-        "Client Comment:" +
-        data.comment;
-      MailNode(SMSNumber, subject, content, function() {
-        res
-          .status(200)
-          .json({ code: 0, message: "A SMS was sent to the owner" });
-      });
-    }
+
+    io.sockets.emit("new review", data);
+    res
+      .status(200)
+      .json({ code: 0, message: "A review was sent to the owner" });
+
+    const subject = "A Review From Client";
+    const content =
+      "Client Name: " +
+      data.name +
+      "\n" +
+      "Client Rating: " +
+      "\n" +
+      data.rating +
+      "\n" +
+      "Client Comment:" +
+      data.comment;
+    MailNode(SMSNumber, subject, content, function() {
+      res.status(200).json({ code: 0, message: "A SMS was sent to the owner" });
+    });
+  });
+});
+
+router.delete("/:id", (req, res) => {
+  Review.findOneAndRemove({ _id: req.params.id }).then(result => {
+    io.sockets.emit("delete review", result);
+    res
+      .status(200)
+      .json({ code: 0, message: "Review was deleted successfully" });
   });
 });
 
