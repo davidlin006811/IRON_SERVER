@@ -4,8 +4,7 @@ const bodyParser = require("body-parser");
 const cros = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
-const uuid = require("./functions/uuid");
-global[uuid] = {};
+let admins = {};
 //const compression = require("compression");
 const app = express();
 
@@ -34,25 +33,29 @@ const server = require("http").createServer(app);
 io = require("socket.io").listen(server);
 io.on("connection", function(socket) {
   console.log("new user connected");
-  socket.on("admin init", () => {
+  socket.on("admin init", (data, callback) => {
     //sotre the admin socket to global variable
     const date = new Date();
     const time = date.getTime();
     console.log(time);
+    console.log("admin init");
     socket.username = time;
-    global[uuid][socket.username] = socket;
+    admins[socket.username] = socket;
+    socket.join("admins");
+    callback({ result: "success" });
   });
   socket.on("disconnect", function() {
-    if (socket === global[uuid][socket.username]) {
-      delete global[uuid][socket.username];
+    if (socket === admins[socket.username]) {
+      delete admins[socket.username];
     }
     console.log("a user disconnected");
-    console.log(global[uuid]);
+    console.log(admins);
   });
   socket.on("logout", function() {
-    delete global[uuid][socket.username];
+    socket.leave("admins");
+    delete admins[socket.username];
     console.log("a user disconnected");
-    console.log(global[uuid]);
+    console.log(admins);
   });
 });
 

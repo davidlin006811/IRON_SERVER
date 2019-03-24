@@ -2,10 +2,9 @@ const mongoose = require("mongoose");
 const router = require("express").Router();
 const Message = require("../models/message");
 const uuid = require("../functions/uuid");
-const ADMIN = require("../config/admin").role;
 const SMSNumber = require("../config/admin").SMSNumber;
 const MailNode = require("../functions/mail");
-const isEmpty = require("../functions/isEmpty");
+
 router.get("/all", (req, res) => {
   Message.find()
     .sort({ date: -1 })
@@ -24,40 +23,31 @@ router.post("/", (req, res) => {
   });
   //save new message to database
   message.save().then(data => {
-    const result = {
-      name: data.name,
-      email: data.email,
-      content: data.content,
-      date: data.date
-    };
     //if onwer is online and logged in, send the message via socket.io
-    if (!isEmpty(global[uuid])) {
-      const admins = Object.keys(global[uuid]);
-      for (const admin in admins) {
-        global[uuid][admin].emit("new message", result);
-      }
+    // console.log(io);
+    io.to("admins").emit("new message", data);
+    res.status(200).json({ code: 0, message: "Message was sent to the owner" });
 
-      res
-        .status(200)
-        .json({ code: 0, message: "Message was sent to the owner" });
-    } else {
-      const subject = "A Message From Client";
-      const content =
-        "Client Name: " +
-        result.name +
-        "\n" +
-        "Client Email: " +
-        "\n" +
-        result.email +
-        "\n" +
-        " Mesage:" +
-        result.content;
-      MailNode(SMSNumber, subject, content, function() {
-        res
-          .status(200)
-          .json({ code: 0, message: "A SMS was sent to the owner" });
-      });
-    }
+    const subject = "A Message From Client";
+    const content =
+      "Client Name: " +
+      data.name +
+      "\n" +
+      "Client Email: " +
+      "\n" +
+      data.email +
+      "\n" +
+      " Mesage:" +
+      data.content;
+    MailNode(SMSNumber, subject, content, function() {
+      res.status(200).json({ code: 0, message: "A SMS was sent to the owner" });
+    });
+  });
+});
+router.delete("/:id", (req, res) => {
+  Message.findOneAndDelete({ _id: req.params.id }).then(result => {
+    io.to("admins").emit("delete message", result);
+    res.json({ code: 0, message: "Message was deleted successfully" });
   });
 });
 module.exports = router;
