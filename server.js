@@ -66,6 +66,7 @@ const messageRouter = require("./routers/messageRouter");
 const reviewRouter = require("./routers/reviewRouter");
 const careerRouter = require("./routers/careerRouter");
 const appointmentRouter = require("./routers/appointmentRouter");
+const themeRouter = require("./routers/themeRouter");
 
 app.use("/api", userRouter);
 app.use("/api/product", productRouter);
@@ -73,6 +74,7 @@ app.use("/api/message", messageRouter);
 app.use("/api/review", reviewRouter);
 app.use("/api/career", careerRouter);
 app.use("/api/appointment", appointmentRouter);
+app.use("/api/theme", themeRouter);
 
 //Listen to the port 3000
 const PORT = process.env.PORT || 3000;
