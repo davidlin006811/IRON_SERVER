@@ -36,22 +36,30 @@ router.post("/login", (req, res) => {
 });
 /* admin reset password */
 router.post("/resetPassword", (req, res) => {
-  const email = req.body.email;
+  const resetToken = req.body.token;
   const newPassword = req.body.password;
-  if (email !== admin.email) {
-    res.status(401).json({ code: 1, message: "password failed to change" });
-  } else {
-    User.findOne({ email: email }).then(user => {
-      hashPassword(newPassword).then(newHashPassword => {
-        user.password = newHashPassword;
-        user.save().then(result => {
-          res
-            .status(200)
-            .json({ code: 0, message: "change password successfully" });
+
+  User.findOne({ resetToken: resetToken })
+    .then(user => {
+      if (!user) {
+        res
+          .status(200)
+          .json({ code: 1, message: "No ush user. Maybe token is unavilable" });
+      } else {
+        hashPassword(newPassword).then(newHashPassword => {
+          user.password = newHashPassword;
+          user.token = null;
+          user.save().then(result => {
+            res
+              .status(200)
+              .json({ code: 0, message: "change password successfully" });
+          });
         });
-      });
+      }
+    })
+    .catch(error => {
+      console.log(error);
     });
-  }
 });
 /*admin frogot password */
 router.post("/forgotPassword", (req, res) => {
