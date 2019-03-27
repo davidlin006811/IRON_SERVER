@@ -56,16 +56,27 @@ router.post("/resetPassword", (req, res) => {
 /*admin frogot password */
 router.post("/forgotPassword", (req, res) => {
   const smsNumber = req.body.smsNumber;
-  if (smsNumber !== admin.SMSNumber) {
-    res.status(401).json({ code: 1, message: "cellphone number not match" });
+  if (smsNumber !== admin.phone) {
+    res
+      .status(200)
+      .json({ code: 1, message: "cellphone number does not match" });
   } else {
     const token = generateToken(6);
     const subject = "Verification Code";
     const content = `Reset password code: ${token}`;
 
-    MailNode(admin.SMSNumber, subject, content, function() {
-      res.status(200).json({ code: 0, token: token });
-    });
+    User.findOne({ email: admin.email })
+      .then(user => {
+        user.resetToken = token;
+        user.save().then(result => {
+          MailNode(admin.SMSNumber, subject, content, function() {
+            res.status(200).json({ code: 0, token: token });
+          });
+        });
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
 });
 
