@@ -5,11 +5,12 @@ const comparePassword = require("../functions/hash").comparePassword;
 const hashPassword = require("../functions/hash").hashPassword;
 const admin = require("../config/admin");
 const jwtToken = require("../functions/jwtToken");
-const sendSMS = require("../functions/mail");
+const MailNode = require("../functions/mail");
+const generateToken = require("../functions/rendomToken");
 /*admin login */
 router.post("/login", (req, res) => {
-  var email = req.body.email;
-  var password = req.body.password;
+  const email = req.body.email;
+  const password = req.body.password;
 
   if (email !== admin.email) {
     res.status(401).json({ message: "Login failed" });
@@ -33,34 +34,69 @@ router.post("/login", (req, res) => {
     });
   }
 });
-/* admin change password */
-router.post("/changePassword", (req, res) => {
-  let email = req.body.email;
-  let oldPassword = req.body.oldPassword;
-  let newPassword = req.body.newPassword;
+/* admin reset password */
+router.post("/resetPassword", (req, res) => {
+  const email = req.body.email;
+  const newPassword = req.body.password;
   if (email !== admin.email) {
     res.status(401).json({ code: 1, message: "password failed to change" });
   } else {
     User.findOne({ email: email }).then(user => {
-      comparePassword(oldPassword, user.password).then(isMatch => {
-        if (isMatch) {
-          hashPassword(newPassword).then(newHashPassword => {
-            user.password = newHashPassword;
-            user.save().then(result => {
-              res
-                .status(200)
-                .json({ code: 0, message: "change password successfully" });
-            });
-          });
-        } else {
+      hashPassword(newPassword).then(newHashPassword => {
+        user.password = newHashPassword;
+        user.save().then(result => {
           res
             .status(200)
-            .json({ code: 1, message: "password failed to change" });
-        }
+            .json({ code: 0, message: "change password successfully" });
+        });
       });
     });
   }
 });
 /*admin frogot password */
-router.post("/forgotPassword", (req, res) => {});
+router.post("/forgotPassword", (req, res) => {
+  const smsNumber = req.body.smsNumber;
+  if (smsNumber !== admin.SMSNumber) {
+    res.status(401).json({ code: 1, message: "cellphone number not match" });
+  } else {
+    const token = generateToken(6);
+    const subject = "Verification Code";
+    const content = `Reset password code: ${token}`;
+
+    MailNode(admin.SMSNumber, subject, content, function() {
+      res.status(200).json({ code: 0, token: token });
+    });
+  }
+});
+
+/* admin change password */
+router.post("/changePassword", (req, res) => {
+  const email = req.body.email;
+  const oldPassword = req.body.oldPassword;
+  const newPassword = req.body.newPassword;
+  if (email !== admin.email) {
+    res.status(401).json({ code: 1, message: "password failed to change" });
+  } else {
+    {
+      User.findOne({ email: email }).then(user => {
+        comparePassword(oldPassword, user.password).then(isMatch => {
+          if (isMatch) {
+            hashPassword(newPassword).then(newHashPassword => {
+              user.password = newHashPassword;
+              user.save().then(result => {
+                res
+                  .status(200)
+                  .json({ code: 0, message: "change password successfully" });
+              });
+            });
+          } else {
+            res
+              .status(200)
+              .json({ code: 1, message: "password failed to change" });
+          }
+        });
+      });
+    }
+  }
+});
 module.exports = router;
