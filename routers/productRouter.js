@@ -36,6 +36,7 @@ router.post("/", isLoggedIn, upload.array("images"), (req, res) => {
         createdProduct: {
           _id: result._id,
           name: result.name,
+          type: result.type,
           description: result.description,
           images: result.images
         }

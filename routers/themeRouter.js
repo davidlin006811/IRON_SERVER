@@ -3,7 +3,7 @@ const router = express.Router();
 const isLoggedIn = require("../functions/isLoggedin");
 const fs = require("fs");
 
-router.get("/all", isLoggedIn, (req, res) => {
+router.get("/all", (req, res) => {
   const rawdata = fs.readFileSync("theme.json");
   const theme = JSON.parse(rawdata);
   res.status(200).json(theme);
