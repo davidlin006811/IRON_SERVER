@@ -23,11 +23,8 @@ router.post("/", (req, res) => {
     "\n" +
     data.email +
     "\n" +
-    " Mesage:" +
-    data.content +
-    "\n" +
-    "Scedule:" +
-    data.time;
+    "Appointment:" +
+    data.date;
   MailNode(SMSNumber, subject, content, function() {
     res
       .status(200)
