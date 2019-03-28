@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const Career = require("../models/career");
-//const Candidate = require("../models/candidate");
 const isLoggedIn = require("../functions/isLoggedin");
 const upload = require("../functions/uploader");
 const fs = require("fs");
@@ -50,7 +49,7 @@ router.post("/apply/:id", upload.array("resumes"), (req, res) => {
 //For Back-end management side:
 
 //3) List all careers - /api/career/list (method: Get, authorization: isLoggedIn), this action will send the all careers including the candidates information to the owner side.
-router.get("/list", (req, res) => {
+router.get("/list", isLoggedIn, (req, res) => {
   Career.find()
     .sort({ _id: -1 })
     .then(careers => res.status(200).json(careers))
@@ -58,7 +57,7 @@ router.get("/list", (req, res) => {
 });
 
 //5) Delete a career - /api/career/:careerId (method: Delete, authorization:  isLoggedIn), this action allows the owner delete a career
-router.delete("/:id", (req, res) => {
+router.delete("/:id", isLoggedIn, (req, res) => {
   let imagePaths = [];
 
   Career.findByIdAndDelete(req.params.id)
@@ -96,7 +95,7 @@ router.delete("/:id", (req, res) => {
 });
 
 //6) Post a career - /api/career (method: Post, authorization:  isLoggedIn), this action allows the owner post a career
-router.post("/", upload.array("images"), (req, res) => {
+router.post("/", isLoggedIn, upload.array("images"), (req, res) => {
   const filePaths = req.files.map(file =>
     file.path.replace(new RegExp("\\\\", "g"), "/")
   );

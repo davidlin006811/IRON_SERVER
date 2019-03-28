@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const router = require("express").Router();
 const Message = require("../models/message");
-const uuid = require("../functions/uuid");
 const SMSNumber = require("../config/admin").SMSNumber;
 const MailNode = require("../functions/mail");
+const isLoggedIn = require("../functions/isLoggedin");
 
-router.get("/all", (req, res) => {
+router.get("/all", isLoggedIn, (req, res) => {
   Message.find()
     .sort({ date: -1 })
     .then(messages => {
@@ -44,7 +44,7 @@ router.post("/", (req, res) => {
     });
   });
 });
-router.delete("/:id", (req, res) => {
+router.delete("/:id", isLoggedIn, (req, res) => {
   Message.findOneAndDelete({ _id: req.params.id }).then(result => {
     io.to("admins").emit("delete message", result);
     res.json({ code: 0, message: "Message was deleted successfully" });

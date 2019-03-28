@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Review = require("../models/review");
-const uuid = require("../functions/uuid");
+const isLoggedIn = require("../functions/isLoggedin");
 const SMSNumber = require("../config/admin").SMSNumber;
 const MailNode = require("../functions/mail");
-const isEmpty = require("../functions/isEmpty");
+
 //1) Get all reviews API - /api/review/all, for the response, please refer to the client-side coding tasks.
 router.get("/all", (req, res) => {
   Review.find()
@@ -48,7 +48,7 @@ router.post("/", (req, res) => {
   });
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", isLoggedIn, (req, res) => {
   Review.findOneAndRemove({ _id: req.params.id }).then(result => {
     io.sockets.emit("delete review", result);
     res

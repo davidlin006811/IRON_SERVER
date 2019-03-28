@@ -7,6 +7,7 @@ const admin = require("../config/admin");
 const jwtToken = require("../functions/jwtToken");
 const MailNode = require("../functions/mail");
 const generateToken = require("../functions/rendomToken");
+const isLoggedIn = require("../functions/isLoggedin");
 /*admin login */
 router.post("/login", (req, res) => {
   const email = req.body.email;
@@ -89,7 +90,7 @@ router.post("/forgotPassword", (req, res) => {
 });
 
 /* admin change password */
-router.post("/changePassword", (req, res) => {
+router.post("/changePassword", isLoggedIn, (req, res) => {
   const email = req.body.email;
   const oldPassword = req.body.oldPassword;
   const newPassword = req.body.newPassword;

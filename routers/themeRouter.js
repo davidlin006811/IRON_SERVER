@@ -1,15 +1,16 @@
 const express = require("express");
 const router = express.Router();
+const isLoggedIn = require("../functions/isLoggedin");
 const fs = require("fs");
 
-router.get("/all", (req, res) => {
+router.get("/all", isLoggedIn, (req, res) => {
   const rawdata = fs.readFileSync("theme.json");
   const theme = JSON.parse(rawdata);
   res.status(200).json(theme);
 });
 
 //post a new theme
-router.post("/", (req, res) => {
+router.post("/", isLoggedIn, (req, res) => {
   const data = req.body;
   io.sockets.emit("new theme", req.body);
   const rawdata = fs.readFileSync("theme.json");
@@ -19,7 +20,7 @@ router.post("/", (req, res) => {
   res.status(200).json({ code: 0, message: "save theme successfully" });
 });
 
-router.patch("/", (req, res) => {
+router.patch("/", isLoggedIn, (req, res) => {
   io.sockets.emit("select theme", req.body.selectedPresetIndex);
   const rawdata = fs.readFileSync("theme.json");
   const theme = JSON.parse(rawdata);

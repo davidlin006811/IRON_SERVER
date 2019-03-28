@@ -15,7 +15,7 @@ router.get("/all", (req, res) => {
     .then(products => res.json(products));
 });
 // Add a new product
-router.post("/", upload.array("images"), (req, res) => {
+router.post("/", isLoggedIn, upload.array("images"), (req, res) => {
   //console.log("reg: ", req);
   var filePaths = req.files.map(file =>
     file.path.replace(new RegExp("\\\\", "g"), "/")
@@ -55,7 +55,7 @@ router.post("/", upload.array("images"), (req, res) => {
 });
 
 //Update a product
-router.patch("/:id", (req, res) => {
+router.patch("/:id", isLoggedIn, (req, res) => {
   //console.log(req);
   Product.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true })
     .then(result => {
@@ -70,7 +70,7 @@ router.patch("/:id", (req, res) => {
 });
 
 //Delete a product
-router.delete("/:id", (req, res) => {
+router.delete("/:id", isLoggedIn, (req, res) => {
   let filePaths = [];
   Product.findByIdAndDelete(req.params.id)
     .then(result => {
