@@ -44,7 +44,7 @@ router.post("/resetPassword", (req, res) => {
       if (!user) {
         res
           .status(200)
-          .json({ code: 1, message: "No ush user. Maybe token is unavilable" });
+          .json({ code: 1, message: "User nof found or token is unavilable" });
       } else {
         hashPassword(newPassword).then(newHashPassword => {
           user.password = newHashPassword;
