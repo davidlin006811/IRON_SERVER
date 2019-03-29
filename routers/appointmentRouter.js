@@ -23,12 +23,17 @@ router.post("/", (req, res) => {
     "\n" +
     data.email +
     "\n" +
-    "Appointment:" +
-    data.date;
+    "Appointment Date: " +
+    data.date +
+    "\n" +
+    "Event: " +
+    data.content;
   MailNode(SMSNumber, subject, content, function() {
-    res
-      .status(200)
-      .json({ code: 0, message: "An appointment was sent to the owner" });
+    res.status(200).json({
+      code: 0,
+      message: "An appointment was sent to the owner",
+      appointemnt: req.body
+    });
   });
 });
 // export router
