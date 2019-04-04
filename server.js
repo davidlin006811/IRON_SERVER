@@ -49,13 +49,13 @@ io.on("connection", function(socket) {
       delete admins[socket.username];
     }
     console.log("a user disconnected");
-    console.log(admins);
+    //console.log(admins);
   });
   socket.on("logout", function() {
     socket.leave("admins");
     delete admins[socket.username];
     console.log("a user disconnected");
-    console.log(admins);
+    //console.log(admins);
   });
 });
 

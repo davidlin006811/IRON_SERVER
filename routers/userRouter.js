@@ -8,10 +8,17 @@ const jwtToken = require("../functions/jwtToken");
 const MailNode = require("../functions/mail");
 const generateToken = require("../functions/rendomToken");
 const isLoggedIn = require("../functions/isLoggedin");
+const sanitizeHtml = require("sanitize-html"); // HTML sanitizer
 /*admin login */
 router.post("/login", (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
+  const email = sanitizeHtml(req.body.email, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+  const password = sanitizeHtml(req.body.password, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
 
   if (email !== admin.email) {
     res.status(401).json({ message: "Login failed" });
@@ -37,8 +44,14 @@ router.post("/login", (req, res) => {
 });
 /* admin reset password */
 router.post("/resetPassword", (req, res) => {
-  const resetToken = req.body.token;
-  const newPassword = req.body.password;
+  const resetToken = sanitizeHtml(req.body.token, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+  const newPassword = sanitizeHtml(req.body.password, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
 
   User.findOne({ resetToken: resetToken })
     .then(user => {
@@ -64,7 +77,10 @@ router.post("/resetPassword", (req, res) => {
 });
 /*admin frogot password */
 router.post("/forgotPassword", (req, res) => {
-  const smsNumber = req.body.smsNumber;
+  const smsNumber = sanitizeHtml(req.body.smsNumber, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
   if (smsNumber !== admin.phone) {
     res
       .status(200)
@@ -91,9 +107,18 @@ router.post("/forgotPassword", (req, res) => {
 
 /* admin change password */
 router.post("/changePassword", isLoggedIn, (req, res) => {
-  const email = req.body.email;
-  const oldPassword = req.body.oldPassword;
-  const newPassword = req.body.newPassword;
+  const email = sanitizeHtml(req.body.email, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+  const oldPassword = sanitizeHtml(req.body.oldPassword, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+  const newPassword = sanitizeHtml(req.body.newPassword, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
   if (email !== admin.email) {
     res.status(401).json({ code: 1, message: "password failed to change" });
   } else {

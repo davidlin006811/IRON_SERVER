@@ -1,1 +1,22 @@
-{"selectedPresetIndex":"0","presets":[{"name":"default","background":"#000","text":"#fefefe","link":"#fdee30","button":"#fdee30"},{"name":"Cool and Fresh","background":"#5cdb95","text":"#fff","link":"#05386b","button":"#edf5e1"},{"name":"Vermillion and Russian Green","background":"#000","text":"#fefefe","link":"#8ee4af","button":"#5cdb95"},{"name":"Elegant Yet Approachable","background":"#eee2dc","text":"#123c69","link":"#ac3b61","button":"#edc7b7"},{"name":"nature","background":"#e1e8f0","text":"#000","link":"#e62739","button":"#6ed3cf"},{"name":"Banana","background":"#8b572a","text":"#ffffff","link":"#9013fe","button":"#4a90e2"}]}
+{
+  "selectedPresetIndex": "0",
+  "presets": [
+    {
+      "name": "default",
+      "background": "#000",
+      "text": "#fefefe",
+      "link": "#fdee30",
+      "button": "#fdee30",
+      "buttonFont": "#000"
+    },
+
+    {
+      "name": "Brightspace",
+      "background": "#8b572a",
+      "text": "#ffffff",
+      "link": "#b8e986",
+      "button": "#4a90e2",
+      "buttonFont": "#ffffff"
+    }
+  ]
+}

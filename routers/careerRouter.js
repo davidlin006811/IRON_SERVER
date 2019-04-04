@@ -4,6 +4,7 @@ const Career = require("../models/career");
 const isLoggedIn = require("../functions/isLoggedin");
 const upload = require("../functions/uploader");
 const fs = require("fs");
+const sanitizeHtml = require("sanitize-html"); // HTML sanitizer
 //For client side:
 
 //1) Get all careers - /api/career/all, for the response, please refer to the client-side coding tasks.
@@ -26,13 +27,23 @@ router.get("/all", (req, res) => {
 });
 
 //2) Apply a career - /api/career/apply (method: Post), this action will add a candidate object to the candidates list of the appropriate career. for the response, please refer to the client-side coding tasks.
-router.post("/apply/:id", upload.array("resumes"), (req, res) => {
+router.post("/apply/:id", upload.array("resume"), (req, res) => {
+  //console.log(req);
   const filePaths = req.files.map(file =>
     file.path.replace(new RegExp("\\\\", "g"), "/")
   );
+  const name = sanitizeHtml(req.body.name, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+  const email = sanitizeHtml(req.body.email, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+
   const candidate = {
-    name: req.body.name,
-    email: req.body.email,
+    name: name,
+    email: email,
     resume: filePaths
   };
   Career.findById(req.params.id)
@@ -99,9 +110,18 @@ router.post("/", isLoggedIn, upload.array("images"), (req, res) => {
   const filePaths = req.files.map(file =>
     file.path.replace(new RegExp("\\\\", "g"), "/")
   );
+  const title = sanitizeHtml(req.body.title, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+  const description = sanitizeHtml(req.body.description, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+
   const career = new Career({
-    title: req.body.title,
-    description: req.body.description,
+    title: title,
+    description: description,
     images: filePaths,
     candidates: []
   });

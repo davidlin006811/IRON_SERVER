@@ -4,7 +4,7 @@ const Message = require("../models/message");
 const SMSNumber = require("../config/admin").SMSNumber;
 const MailNode = require("../functions/mail");
 const isLoggedIn = require("../functions/isLoggedin");
-
+const sanitizeHtml = require("sanitize-html"); // HTML sanitizer
 router.get("/all", isLoggedIn, (req, res) => {
   Message.find()
     .sort({ date: -1 })
@@ -15,11 +15,23 @@ router.get("/all", isLoggedIn, (req, res) => {
 
 router.post("/", (req, res) => {
   //console.log(req);
+  const name = sanitizeHtml(req.body.name, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+  const email = sanitizeHtml(req.body.email, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+  const content = sanitizeHtml(req.body.content, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
   const message = new Message({
     _id: mongoose.Types.ObjectId(),
-    name: req.body.name,
-    email: req.body.email,
-    content: req.body.content
+    name: name,
+    email: email,
+    content: content
   });
   //save new message to database
   message.save().then(data => {
@@ -30,11 +42,10 @@ router.post("/", (req, res) => {
 
     const subject = "A Message From Client";
     const content =
-      "Client Name: " +
+      "Name: " +
       data.name +
       "\n" +
-      "Client Email: " +
-      "\n" +
+      "Email: " +
       data.email +
       "\n" +
       " Mesage:" +
