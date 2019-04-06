@@ -11,14 +11,10 @@ router.get("/all", (req, res) => {
 
 //post a new theme
 router.post("/", isLoggedIn, (req, res) => {
-  const data = sanitizeHtml(req.body, {
-    allowedTags: [],
-    allowedAttributes: {}
-  });
   io.sockets.emit("new theme", req.body);
   const rawdata = fs.readFileSync("theme.json");
   const theme = JSON.parse(rawdata);
-  theme.presets.push(data);
+  theme.presets.push(req.body);
   fs.writeFileSync("theme.json", JSON.stringify(theme));
   res.status(200).json({ code: 0, message: "save theme successfully" });
 });
